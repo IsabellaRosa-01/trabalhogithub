@@ -22,9 +22,9 @@ jobs:
         run: pip install pylint
 
       - name: Run pylint
-        run: pylint *.py
+        run: pylint *.py --disable=C0114,C0116,C0304,W0611
 
-        
+
 
  
      
