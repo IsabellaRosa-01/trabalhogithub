@@ -1,0 +1,43 @@
+name: Continuous Delivery
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Run Linter
+        run: pylint *.py --disable=C0114,C0116,C0304,W0611
+
+      - name: Run Tests
+        run: |
+          if [ -d tests ]; then
+            python -m unittest discover
+          fi
+
+      - name: Create package
+        run: zip -r projeto.zip .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: projeto
+          path: projeto.zip
