@@ -1,9 +1,12 @@
-import json
-from datetime import datetime
-from dataclasses import dataclass, asdict
 """
 Sistema de Farmácia - Controle de estoque e vendas
 """
+
+import json
+from datetime import datetime
+from dataclasses import dataclass, asdict
+
+
 # -------------------------
 # Classe Produto
 # -------------------------
@@ -21,17 +24,19 @@ class Produto:
         """Converte o produto para dicionário"""
         return asdict(self)
 
+
 # -------------------------
 # Sistema
 # -------------------------
 class SistemaFarmacia:
     """Sistema principal de controle da farmácia"""
-    def __init__(self, dados):
-        self.nome = dados["nome"]
-        self.codigo = dados["codigo"]
-        self.quantidade = dados["quantidade"]
-        self.preco = dados["preco"]
-        self.validade = dados["validade"]
+
+    def __init__(self):
+        self.produtos = {}
+        self.vendas = []
+        self.usuarios = {"admin": "123"}
+        self.carregar()
+
     # -------------------------
     # Persistência
     # -------------------------
@@ -63,6 +68,7 @@ class SistemaFarmacia:
                 self.vendas = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             pass
+
     # -------------------------
     # Login
     # -------------------------
@@ -78,6 +84,7 @@ class SistemaFarmacia:
 
         print("❌ Usuário ou senha inválidos!")
         return False
+
     # -------------------------
     # Cadastro
     # -------------------------
@@ -115,6 +122,7 @@ class SistemaFarmacia:
 
         self.salvar()
         print("✔ Produto cadastrado!")
+
     # -------------------------
     # Entrada
     # -------------------------
@@ -135,6 +143,7 @@ class SistemaFarmacia:
         self.produtos[codigo].quantidade += quantidade
         self.salvar()
         print("✔ Entrada registrada!")
+
     # -------------------------
     # Venda
     # -------------------------
@@ -171,6 +180,7 @@ class SistemaFarmacia:
         self.vendas.append(venda)
         self.salvar()
         print("✔ Venda realizada!")
+
     # -------------------------
     # Listar
     # -------------------------
@@ -182,6 +192,7 @@ class SistemaFarmacia:
                 f"{p.nome} | Código: {p.codigo} | "
                 f"Qtde: {p.quantidade} | Validade: {p.validade}"
             )
+
     # -------------------------
     # Alertas
     # -------------------------
@@ -204,6 +215,7 @@ class SistemaFarmacia:
         for p in self.produtos.values():
             if p.quantidade <= limite:
                 print(f"⚠ {p.nome} com {p.quantidade} unidades")
+
     # -------------------------
     # Relatório
     # -------------------------
@@ -234,6 +246,8 @@ class SistemaFarmacia:
                 total += v["total"]
 
         print(f"\n💰 Total: R$ {total:.2f}")
+
+
 # -------------------------
 # Menu
 # -------------------------
@@ -277,6 +291,6 @@ def menu():
         else:
             print("Opção inválida!")
 
+
 if __name__ == "__main__":
     menu()
-    
