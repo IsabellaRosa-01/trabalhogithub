@@ -1,26 +1,28 @@
 import json
 from datetime import datetime
-def listar_produtos(self):
-    print("\n=== ESTOQUE ===")
-    for p in self.produtos.values():
-        print(f"{p.nome} | Código: {p.codigo} | Qtde: {p.quantidade} | Validade: {p.validade}")
-
-def verificar_vencimento(self):
-    hoje = datetime.now().date()
-    print("\n=== VENCIMENTOS ===")
-
-    for p in self.produtos.values():
-        validade = datetime.strptime(p.validade, "%Y-%m-%d").date()
-
-        if validade <= hoje:
-            print(f"⚠ {p.nome} VENCIDO!")
-        elif (validade - hoje).days <= 30:
-            print(f"⚠ {p.nome} vence em breve!")
 
 
-def estoque_baixo(self, limite=5):
-    print("\n=== ESTOQUE BAIXO ===")
-    for p in self.produtos.values():
-        if p.quantidade <= limite:
-            print(f"⚠ {p.nome} com {p.quantidade} unidades")
+def relatorio_vendas(self):
+    print("\n=== RELATÓRIO DE VENDAS ===")
+
+    data_inicio = input("Data início (YYYY-MM-DD): ")
+    data_fim = input("Data fim (YYYY-MM-DD): ")
+
+    try:
+        inicio = datetime.strptime(data_inicio, "%Y-%m-%d")
+        fim = datetime.strptime(data_fim, "%Y-%m-%d")
+    except:
+        print("⚠ Data inválida!")
+        return
+
+    total = 0
+
+    for v in self.vendas:
+        data = datetime.strptime(v["data"], "%Y-%m-%d")
+
+        if inicio <= data <= fim:
+            print(f"{v['data']} | {v['nome']} | Qtde: {v['quantidade']} | R$ {v['total']}")
+            total += v["total"]
+
+    print(f"\n💰 Total: R$ {total:.2f}")
 
