@@ -1,59 +1,73 @@
 import json
 from datetime import datetime
+from dataclasses import dataclass, asdict
+"""
+Sistema de Farmácia - Controle de estoque e vendas
+"""
 # -------------------------
 # Classe Produto
 # -------------------------
+@dataclass
 class Produto:
-    def __init__(self, nome, codigo, quantidade, preco, validade):
-        self.nome = nome
-        self.codigo = codigo
-        self.quantidade = quantidade
-        self.preco = preco
-        self.validade = validade
+    """Representa um produto da farmácia"""
+
+    nome: str
+    codigo: str
+    quantidade: int
+    preco: float
+    validade: str
 
     def to_dict(self):
-        return self.__dict__
-
+        """Converte o produto para dicionário"""
+        return asdict(self)
 
 # -------------------------
 # Sistema
 # -------------------------
 class SistemaFarmacia:
-    def __init__(self):
-        self.produtos = {}
-        self.vendas = []
-        self.usuarios = {"admin": "123"}
-        self.carregar()
-
+    """Sistema principal de controle da farmácia"""
+    def __init__(self, dados):
+        self.nome = dados["nome"]
+        self.codigo = dados["codigo"]
+        self.quantidade = dados["quantidade"]
+        self.preco = dados["preco"]
+        self.validade = dados["validade"]
     # -------------------------
     # Persistência
     # -------------------------
     def salvar(self):
-        with open("estoque.json", "w") as f:
-            json.dump({k: v.to_dict() for k, v in self.produtos.items()}, f, indent=4)
+        """Salva dados em arquivos JSON"""
+        with open("estoque.json", "w", encoding="utf-8") as f:
+            json.dump(
+                {k: v.to_dict() for k, v in self.produtos.items()},
+                f,
+                indent=4,
+                ensure_ascii=False,
+            )
 
-        with open("vendas.json", "w") as f:
-            json.dump(self.vendas, f, indent=4)
+        with open("vendas.json", "w", encoding="utf-8") as f:
+            json.dump(self.vendas, f, indent=4, ensure_ascii=False)
 
     def carregar(self):
+        """Carrega dados dos arquivos JSON"""
         try:
-            with open("estoque.json", "r") as f:
+            with open("estoque.json", "r", encoding="utf-8") as f:
                 dados = json.load(f)
                 for k, v in dados.items():
                     self.produtos[k] = Produto(**v)
-        except:
+        except (FileNotFoundError, json.JSONDecodeError):
             pass
 
         try:
-            with open("vendas.json", "r") as f:
+            with open("vendas.json", "r", encoding="utf-8") as f:
                 self.vendas = json.load(f)
-        except:
+        except (FileNotFoundError, json.JSONDecodeError):
             pass
-
     # -------------------------
     # Login
     # -------------------------
     def login(self):
+        """Realiza autenticação do usuário"""
         print("\n=== LOGIN ===")
         user = input("Usuário: ")
         senha = input("Senha: ")
@@ -61,14 +75,14 @@ class SistemaFarmacia:
         if user in self.usuarios and self.usuarios[user] == senha:
             print("✔ Login realizado com sucesso!")
             return True
-        else:
-            print("❌ Usuário ou senha inválidos!")
-            return False
 
+        print("❌ Usuário ou senha inválidos!")
+        return False
     # -------------------------
     # Cadastro
     # -------------------------
     def cadastrar_produto(self):
+        """Cadastra um novo produto"""
         nome = input("Nome: ")
         codigo = input("Código: ")
 
@@ -76,45 +90,68 @@ class SistemaFarmacia:
             print("⚠ Produto já existe!")
             return
 
-        quantidade = int(input("Quantidade: "))
-        preco = float(input("Preço: "))
+        try:
+            quantidade = int(input("Quantidade: "))
+            preco = float(input("Preço: "))
+        except ValueError:
+            print("⚠ Valores inválidos!")
+            return
+
         validade = input("Validade (YYYY-MM-DD): ")
 
         try:
             datetime.strptime(validade, "%Y-%m-%d")
-        except:
+        except ValueError:
             print("⚠ Data inválida!")
             return
 
-        self.produtos[codigo] = Produto(nome, codigo, quantidade, preco, validade)
+        self.produtos[codigo] = Produto(
+            nome=nome,
+            codigo=codigo,
+            quantidade=quantidade,
+            preco=preco,
+            validade=validade,
+        )
+
         self.salvar()
         print("✔ Produto cadastrado!")
-
     # -------------------------
     # Entrada
     # -------------------------
     def entrada(self):
+        """Registra entrada de estoque"""
         codigo = input("Código: ")
+
         if codigo not in self.produtos:
             print("⚠ Produto não encontrado!")
             return
 
-        quantidade = int(input("Quantidade: "))
+        try:
+            quantidade = int(input("Quantidade: "))
+        except ValueError:
+            print("⚠ Valor inválido!")
+            return
+
         self.produtos[codigo].quantidade += quantidade
         self.salvar()
         print("✔ Entrada registrada!")
-
     # -------------------------
-    # Venda (Saída)
+    # Venda
     # -------------------------
     def vender(self):
+        """Realiza venda de produto"""
         codigo = input("Código: ")
 
         if codigo not in self.produtos:
             print("⚠ Produto não encontrado!")
             return
 
-        quantidade = int(input("Quantidade: "))
+        try:
+            quantidade = int(input("Quantidade: "))
+        except ValueError:
+            print("⚠ Valor inválido!")
+            return
+
         produto = self.produtos[codigo]
 
         if produto.quantidade < quantidade:
@@ -128,25 +165,28 @@ class SistemaFarmacia:
             "nome": produto.nome,
             "quantidade": quantidade,
             "total": quantidade * produto.preco,
-            "data": datetime.now().strftime("%Y-%m-%d")
+            "data": datetime.now().strftime("%Y-%m-%d"),
         }
 
         self.vendas.append(venda)
         self.salvar()
         print("✔ Venda realizada!")
-
     # -------------------------
     # Listar
     # -------------------------
     def listar_produtos(self):
+        """Lista produtos em estoque"""
         print("\n=== ESTOQUE ===")
         for p in self.produtos.values():
-            print(f"{p.nome} | Código: {p.codigo} | Qtde: {p.quantidade} | Validade: {p.validade}")
-
+            print(
+                f"{p.nome} | Código: {p.codigo} | "
+                f"Qtde: {p.quantidade} | Validade: {p.validade}"
+            )
     # -------------------------
     # Alertas
     # -------------------------
     def verificar_vencimento(self):
+        """Verifica produtos vencidos ou próximos do vencimento"""
         hoje = datetime.now().date()
         print("\n=== VENCIMENTOS ===")
 
@@ -159,15 +199,16 @@ class SistemaFarmacia:
                 print(f"⚠ {p.nome} vence em breve!")
 
     def estoque_baixo(self, limite=5):
+        """Lista produtos com estoque baixo"""
         print("\n=== ESTOQUE BAIXO ===")
         for p in self.produtos.values():
             if p.quantidade <= limite:
                 print(f"⚠ {p.nome} com {p.quantidade} unidades")
-
     # -------------------------
     # Relatório
     # -------------------------
     def relatorio_vendas(self):
+        """Gera relatório de vendas por período"""
         print("\n=== RELATÓRIO DE VENDAS ===")
 
         data_inicio = input("Data início (YYYY-MM-DD): ")
@@ -176,7 +217,7 @@ class SistemaFarmacia:
         try:
             inicio = datetime.strptime(data_inicio, "%Y-%m-%d")
             fim = datetime.strptime(data_fim, "%Y-%m-%d")
-        except:
+        except ValueError:
             print("⚠ Data inválida!")
             return
 
@@ -186,16 +227,18 @@ class SistemaFarmacia:
             data = datetime.strptime(v["data"], "%Y-%m-%d")
 
             if inicio <= data <= fim:
-                print(f"{v['data']} | {v['nome']} | Qtde: {v['quantidade']} | R$ {v['total']}")
+                print(
+                    f"{v['data']} | {v['nome']} | "
+                    f"Qtde: {v['quantidade']} | R$ {v['total']}"
+                )
                 total += v["total"]
 
         print(f"\n💰 Total: R$ {total:.2f}")
-
-
 # -------------------------
 # Menu
 # -------------------------
 def menu():
+    """Menu principal do sistema"""
     sistema = SistemaFarmacia()
 
     if not sistema.login():
@@ -233,7 +276,6 @@ def menu():
             break
         else:
             print("Opção inválida!")
-
 
 if __name__ == "__main__":
     menu()
