@@ -247,7 +247,6 @@ class SistemaFarmacia:
 
         print(f"\n💰 Total: R$ {total:.2f}")
 
-
 # -------------------------
 # Menu
 # -------------------------
@@ -294,5 +293,3 @@ def menu():
 
 if __name__ == "__main__":
     menu()
-
-    
