@@ -1,44 +1,26 @@
 import json
 from datetime import datetime
-def menu():
-    sistema = SistemaFarmacia()
+def listar_produtos(self):
+    print("\n=== ESTOQUE ===")
+    for p in self.produtos.values():
+        print(f"{p.nome} | Código: {p.codigo} | Qtde: {p.quantidade} | Validade: {p.validade}")
 
-    if not sistema.login():
-        return
+def verificar_vencimento(self):
+    hoje = datetime.now().date()
+    print("\n=== VENCIMENTOS ===")
 
-    while True:
-        print("\n=== MENU ===")
-        print("1 - Cadastrar produto")
-        print("2 - Entrada de estoque")
-        print("3 - Vender produto")
-        print("4 - Listar produtos")
-        print("5 - Verificar vencimentos")
-        print("6 - Estoque baixo")
-        print("7 - Relatório de vendas")
-        print("0 - Sair")
+    for p in self.produtos.values():
+        validade = datetime.strptime(p.validade, "%Y-%m-%d").date()
 
-        op = input("Escolha: ")
-
-        if op == "1":
-            sistema.cadastrar_produto()
-        elif op == "2":
-            sistema.entrada()
-        elif op == "3":
-            sistema.vender()
-        elif op == "4":
-            sistema.listar_produtos()
-        elif op == "5":
-            sistema.verificar_vencimento()
-        elif op == "6":
-            sistema.estoque_baixo()
-        elif op == "7":
-            sistema.relatorio_vendas()
-        elif op == "0":
-            print("Encerrando...")
-            break
-        else:
-            print("Opção inválida!")
+        if validade <= hoje:
+            print(f"⚠ {p.nome} VENCIDO!")
+        elif (validade - hoje).days <= 30:
+            print(f"⚠ {p.nome} vence em breve!")
 
 
-if __name__ == "__main__":
-    menu()
+def estoque_baixo(self, limite=5):
+    print("\n=== ESTOQUE BAIXO ===")
+    for p in self.produtos.values():
+        if p.quantidade <= limite:
+            print(f"⚠ {p.nome} com {p.quantidade} unidades")
+
