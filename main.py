@@ -1,19 +1,7 @@
 import json
 from datetime import datetime
-"""
-Sistema de Farmácia - Controle de estoque e vendas
-"""
 
-import json
-from datetime import datetime
-
-
-# -------------------------
-# Classe Produto
-# -------------------------
 class Produto:
-    """Representa um produto da farmácia"""
-
     def __init__(self, nome, codigo, quantidade, preco, validade):
         self.nome = nome
         self.codigo = codigo
@@ -22,15 +10,9 @@ class Produto:
         self.validade = validade
 
     def to_dict(self):
-        """Converte o objeto para dicionário"""
         return self.__dict__
 
-
-# -------------------------
-# Sistema
-# -------------------------
 class SistemaFarmacia:
-    """Sistema principal de controle da farmácia"""
 
     def __init__(self):
         self.produtos = {}
@@ -38,11 +20,7 @@ class SistemaFarmacia:
         self.usuarios = {"admin": "123"}
         self.carregar()
 
-    # -------------------------
-    # Persistência
-    # -------------------------
     def salvar(self):
-        """Salva dados em arquivos JSON"""
         with open("estoque.json", "w", encoding="utf-8") as f:
             json.dump(
                 {k: v.to_dict() for k, v in self.produtos.items()},
@@ -55,7 +33,6 @@ class SistemaFarmacia:
             json.dump(self.vendas, f, indent=4, ensure_ascii=False)
 
     def carregar(self):
-        """Carrega dados dos arquivos JSON"""
         try:
             with open("estoque.json", "r", encoding="utf-8") as f:
                 dados = json.load(f)
@@ -70,11 +47,7 @@ class SistemaFarmacia:
         except (FileNotFoundError, json.JSONDecodeError):
             pass
 
-    # -------------------------
-    # Login
-    # -------------------------
     def login(self):
-        """Realiza autenticação do usuário"""
         print("\n=== LOGIN ===")
         user = input("Usuário: ")
         senha = input("Senha: ")
@@ -86,11 +59,7 @@ class SistemaFarmacia:
         print("❌ Usuário ou senha inválidos!")
         return False
 
-    # -------------------------
-    # Cadastro
-    # -------------------------
     def cadastrar_produto(self):
-        """Cadastra um novo produto"""
         nome = input("Nome: ")
         codigo = input("Código: ")
 
@@ -117,11 +86,7 @@ class SistemaFarmacia:
         self.salvar()
         print("✔ Produto cadastrado!")
 
-    # -------------------------
-    # Entrada
-    # -------------------------
     def entrada(self):
-        """Registra entrada de estoque"""
         codigo = input("Código: ")
 
         if codigo not in self.produtos:
@@ -138,11 +103,7 @@ class SistemaFarmacia:
         self.salvar()
         print("✔ Entrada registrada!")
 
-    # -------------------------
-    # Venda (Saída)
-    # -------------------------
     def vender(self):
-        """Realiza venda de produto"""
         codigo = input("Código: ")
 
         if codigo not in self.produtos:
@@ -175,11 +136,7 @@ class SistemaFarmacia:
         self.salvar()
         print("✔ Venda realizada!")
 
-    # -------------------------
-    # Listar
-    # -------------------------
     def listar_produtos(self):
-        """Lista produtos em estoque"""
         print("\n=== ESTOQUE ===")
         for p in self.produtos.values():
             print(
@@ -187,11 +144,7 @@ class SistemaFarmacia:
                 f"Qtde: {p.quantidade} | Validade: {p.validade}"
             )
 
-    # -------------------------
-    # Alertas
-    # -------------------------
     def verificar_vencimento(self):
-        """Verifica produtos vencidos ou próximos do vencimento"""
         hoje = datetime.now().date()
         print("\n=== VENCIMENTOS ===")
 
@@ -204,17 +157,12 @@ class SistemaFarmacia:
                 print(f"⚠ {p.nome} vence em breve!")
 
     def estoque_baixo(self, limite=5):
-        """Lista produtos com estoque baixo"""
         print("\n=== ESTOQUE BAIXO ===")
         for p in self.produtos.values():
             if p.quantidade <= limite:
                 print(f"⚠ {p.nome} com {p.quantidade} unidades")
 
-    # -------------------------
-    # Relatório
-    # -------------------------
     def relatorio_vendas(self):
-        """Gera relatório de vendas por período"""
         print("\n=== RELATÓRIO DE VENDAS ===")
 
         data_inicio = input("Data início (YYYY-MM-DD): ")
@@ -241,12 +189,7 @@ class SistemaFarmacia:
 
         print(f"\n💰 Total: R$ {total:.2f}")
 
-
-# -------------------------
-# Menu
-# -------------------------
 def menu():
-    """Menu principal do sistema"""
     sistema = SistemaFarmacia()
 
     if not sistema.login():
@@ -288,3 +231,4 @@ def menu():
 
 if __name__ == "__main__":
     menu()
+    
