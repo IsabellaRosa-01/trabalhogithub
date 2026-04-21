@@ -1,12 +1,10 @@
-"""
-Sistema de Farmácia - Controle de estoque e vendas
-"""
-
 import json
 from datetime import datetime
 from dataclasses import dataclass, asdict
 
-
+"""
+Sistema de Farmácia - Controle de estoque e vendas
+"""
 # -------------------------
 # Classe Produto
 # -------------------------
