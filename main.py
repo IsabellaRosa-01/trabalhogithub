@@ -191,7 +191,6 @@ class SistemaFarmacia:
 
         print(f"\n💰 Total: R$ {total:.2f}")
 
-
 # -------------------------
 # Menu
 # -------------------------
