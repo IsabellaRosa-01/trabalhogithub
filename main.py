@@ -1,7 +1,5 @@
 import json
 from datetime import datetime
-
-
 def listar_produtos(self):
     print("\n=== ESTOQUE ===")
     for p in self.produtos.values():
