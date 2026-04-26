@@ -1,10 +1,21 @@
 import json
 from datetime import datetime
+<<<<<<< Updated upstream
 from dataclasses import dataclass, asdict
 
 """
 Sistema de Farmácia - Controle de estoque e vendas
 """
+=======
+"""
+Sistema de Farmácia - Controle de estoque e vendas
+"""
+
+import json
+from datetime import datetime
+from dataclasses import dataclass, asdict
+
+>>>>>>> Stashed changes
 # -------------------------
 # Classe Produto
 # -------------------------
