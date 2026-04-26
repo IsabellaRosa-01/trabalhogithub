@@ -1,12 +1,14 @@
 name: Continuous Delivery
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Integration CI"]
+    types:
+      - completed
 
 jobs:
   delivery:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -20,12 +22,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-
-      - name: Run Linter
-        run: pylint *.py --disable=C0114,C0116,C0304,W0611
+          python -m pip install --upgrade pip
+          python -m pip install pylint
 
       - name: Run Tests
         run: |
@@ -41,3 +39,29 @@ jobs:
         with:
           name: projeto
           path: projeto.zip
+ 
+  docker:
+    needs: delivery
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: isabellasrosa/app:latest
