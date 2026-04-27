@@ -25,6 +25,17 @@ jobs:
         run: pylint *.py --disable=C0114,C0116,C0304,W0611
 
 
+
+  discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Update Welcome
+        uses: luludotdev/discord-welcome-action@v1
+        with:
+          content: ./content
+          discord-token: ${{ secrets.DISCORD_WELCOME_ACTION }}
         
 
         
