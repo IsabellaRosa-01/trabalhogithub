@@ -1,92 +1,63 @@
 from src.main import SistemaFarmacia, Produto
 import unittest
-from unittest.mock import patch
-import os
 
 
 class TestSistemaFarmacia(unittest.TestCase):
 
     def setUp(self):
-        # Evita interferência de arquivos reais
         self.sistema = SistemaFarmacia()
         self.sistema.produtos = {}
         self.sistema.vendas = []
 
-    # -------------------------
-    # Teste Produto
-    # -------------------------
-    def test_produto_to_dict(self):
-        produto = Produto("Dipirona", "001", 10, 5.0, "2025-12-31")
-        dicionario = produto.to_dict()
+    def test_login(self):
+        self.assertTrue(self.sistema.login("admin", "123"))
+        self.assertFalse(self.sistema.login("admin", "errado"))
 
-        self.assertEqual(dicionario["nome"], "Dipirona")
-        self.assertEqual(dicionario["codigo"], "001")
+    def test_cadastrar_produto(self):
+        result = self.sistema.cadastrar_produto(
+            "Dipirona", "001", 10, 5.0, "2025-12-31"
+        )
+        self.assertTrue(result)
+        self.assertIn("001", self.sistema.produtos)
 
-    # -------------------------
-    # Teste Login
-    # -------------------------
-    @patch("builtins.input", side_effect=["admin", "123"])
-    def test_login_sucesso(self, mock_input):
-        self.assertTrue(self.sistema.login())
+    def test_produto_duplicado(self):
+        self.sistema.cadastrar_produto("A", "001", 10, 5.0, "2025-12-31")
+        result = self.sistema.cadastrar_produto("B", "001", 10, 5.0, "2025-12-31")
+        self.assertFalse(result)
 
-    @patch("builtins.input", side_effect=["admin", "errado"])
-    def test_login_falha(self, mock_input):
-        self.assertFalse(self.sistema.login())
+    def test_entrada(self):
+        self.sistema.cadastrar_produto("A", "001", 10, 5.0, "2025-12-31")
+        self.sistema.entrada("001", 5)
+        self.assertEqual(self.sistema.produtos["001"].quantidade, 15)
 
-    # -------------------------
-    # Teste Cadastro Produto
-    # -------------------------
-    @patch("builtins.input", side_effect=["Paracetamol", "123", "10", "5.5", "2025-12-31"])
-    def test_cadastrar_produto(self, mock_input):
-        self.sistema.cadastrar_produto()
-        self.assertIn("123", self.sistema.produtos)
+    def test_venda(self):
+        self.sistema.cadastrar_produto("A", "001", 10, 5.0, "2025-12-31")
+        result = self.sistema.vender("001", 5)
 
-    # -------------------------
-    # Teste Entrada
-    # -------------------------
-    @patch("builtins.input", side_effect=["123", "5"])
-    def test_entrada_estoque(self, mock_input):
-        self.sistema.produtos["123"] = Produto("Teste", "123", 10, 5.0, "2025-12-31")
-        self.sistema.entrada()
-        self.assertEqual(self.sistema.produtos["123"].quantidade, 15)
-
-    # -------------------------
-    # Teste Venda
-    # -------------------------
-    @patch("builtins.input", side_effect=["123", "5"])
-    def test_vender_produto(self, mock_input):
-        self.sistema.produtos["123"] = Produto("Teste", "123", 10, 5.0, "2025-12-31")
-        self.sistema.vender()
-
-        self.assertEqual(self.sistema.produtos["123"].quantidade, 5)
+        self.assertTrue(result)
+        self.assertEqual(self.sistema.produtos["001"].quantidade, 5)
         self.assertEqual(len(self.sistema.vendas), 1)
 
-    # -------------------------
-    # Teste Venda com estoque insuficiente
-    # -------------------------
-    @patch("builtins.input", side_effect=["123", "20"])
-    def test_venda_estoque_insuficiente(self, mock_input):
-        self.sistema.produtos["123"] = Produto("Teste", "123", 10, 5.0, "2025-12-31")
-        self.sistema.vender()
+    def test_venda_erro(self):
+        self.sistema.cadastrar_produto("A", "001", 10, 5.0, "2025-12-31")
+        result = self.sistema.vender("001", 20)
 
-        self.assertEqual(self.sistema.produtos["123"].quantidade, 10)
+        self.assertFalse(result)
         self.assertEqual(len(self.sistema.vendas), 0)
 
-    # -------------------------
-    # Teste Relatório
-    # -------------------------
-    @patch("builtins.input", side_effect=["2020-01-01", "2030-01-01"])
-    def test_relatorio_vendas(self, mock_input):
-        self.sistema.vendas.append({
-            "codigo": "123",
-            "nome": "Teste",
-            "quantidade": 2,
-            "total": 10.0,
-            "data": "2025-01-01"
-        })
+    def test_estoque_baixo(self):
+        self.sistema.cadastrar_produto("A", "001", 3, 5.0, "2025-12-31")
+        baixos = self.sistema.estoque_baixo()
+        self.assertEqual(len(baixos), 1)
 
-        # Só verifica se roda sem erro
-        self.sistema.relatorio_vendas()
+    def test_relatorio(self):
+        self.sistema.cadastrar_produto("A", "001", 10, 5.0, "2025-12-31")
+        self.sistema.vender("001", 2)
+
+        rel, total = self.sistema.relatorio_vendas("2020-01-01", "2030-01-01")
+
+        self.assertEqual(len(rel), 1)
+        self.assertEqual(total, 10.0)
 
 
 if __name__ == "__main__":
