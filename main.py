@@ -1,7 +1,6 @@
 """
 Sistema de Farmácia - Controle de estoque e vendas
 """
-
 import json
 from datetime import datetime
 from dataclasses import dataclass, asdict
@@ -245,7 +244,6 @@ class SistemaFarmacia:
                 total += v["total"]
 
         print(f"\n💰 Total: R$ {total:.2f}")
-
 
 # -------------------------
 # Menu
