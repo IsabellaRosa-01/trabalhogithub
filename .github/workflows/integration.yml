@@ -24,9 +24,9 @@ jobs:
       - name: Run pylint
         run: pylint *.py --disable=C0114,C0116,C0304,W0611
 
-    discord:
-     needs: build
-     runs-on: ubuntu-latest
+  discord:
+    needs: build
+    runs-on: ubuntu-latest
 
     steps:
       - name: Notificar sucesso
@@ -42,10 +42,3 @@ jobs:
           curl -X POST "${{ secrets.DISCORD_WEBHOOK }}" \
           -H "Content-Type: application/json" \
           -d "{\"content\": \"❌ CI FALHOU!\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.sha }}\"}"
-
-
-
- 
-     
-
-     
