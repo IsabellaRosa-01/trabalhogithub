@@ -25,22 +25,5 @@ jobs:
         run: pylint *.py --disable=C0114,C0116,C0304,W0611
       - name: Run Tests
         run: python -m unittest discover
-
-  discord:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Notificar sucesso
-        if: success()
-        run: |
-          curl -X POST "${{ secrets.DISCORD_WEBHOOK }}" \
-          -H "Content-Type: application/json" \
-          -d "{\"content\": \"✅ CI aprovado!\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.sha }}\"}"
-
-      - name: Notificar falha
-        if: failure()
-        run: |
-          curl -X POST "${{ secrets.DISCORD_WEBHOOK }}" \
-          -H "Content-Type: application/json" \
-          -d "{\"content\": \"❌ CI FALHOU!\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.sha }}\"}"
+      - name: Run Tests
+        run: python -m unittest discover
