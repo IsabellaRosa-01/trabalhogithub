@@ -25,5 +25,3 @@ jobs:
         run: pylint *.py --disable=C0114,C0116,C0304,W0611
       - name: Run Tests
         run: python -m unittest discover
-      - name: Run Tests
-        run: python -m unittest discover
