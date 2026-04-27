@@ -35,7 +35,7 @@ jobs:
        run: |
          curl -H "Content-Type: application/json" \
          -d "{\"content\": \"✅ CI aprovado para o commit ${{ github.sha }} na branch ${{ github.ref_name }}\"}"\
-         "${{ secrets.DISCORD_WEBHOOK }}"
+         ${{ secrets.DISCORD_WEBHOOK }}
         
 
 
