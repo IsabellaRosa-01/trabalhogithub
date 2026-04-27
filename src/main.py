@@ -1,3 +1,6 @@
+"""
+Sistema de Farmácia - Controle de estoque e vendas
+"""
 import json
 from datetime import datetime
 from dataclasses import dataclass, asdict
@@ -5,6 +8,7 @@ from dataclasses import dataclass, asdict
 
 @dataclass
 class Produto:
+    """Representa um produto da farmácia"""
     nome: str
     codigo: str
     quantidade: int
@@ -59,6 +63,7 @@ class SistemaFarmacia:
         return user in self.usuarios and self.usuarios[user] == senha
 
     def cadastrar_produto(self, nome, codigo, quantidade, preco, validade):
+        """Cadastra um novo produto no sistema"""
         if codigo in self.produtos:
             return False
 
