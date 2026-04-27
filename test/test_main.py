@@ -1,7 +1,6 @@
 from src.main import *
 import unittest
 
-
 class TestSistemaFarmacia(unittest.TestCase):
 
     def setUp(self):
