@@ -1,5 +1,6 @@
-from src.main import SistemaFarmacia, Produto
+from src.main import *
 import unittest
+
 
 class TestSistemaFarmacia(unittest.TestCase):
 
